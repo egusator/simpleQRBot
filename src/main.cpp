@@ -97,8 +97,10 @@ void drawQRCodeResults(Mat &frame, const vector<Point> &corners,
 					 s = string(decode_info[qr_idx]);
 
 				}
-				else
+				else {
 					cout << "can't decode QR code" << endl;
+					s = "can't decode QR code";
+				}
 			} else {
 				cout << "decode information is not available (disabled)"
 						<< endl;
@@ -106,6 +108,7 @@ void drawQRCodeResults(Mat &frame, const vector<Point> &corners,
 		}
 	} else {
 		cout << "QR code is not detected" << endl;
+		s = "QR code is not detected";
 	}
 
 }
@@ -171,7 +174,12 @@ int imageQRCodeDetect(std::string filePath) {
 	}
 }
 int main() {
-	Bot bot("2014061180:AAFmtKOdBI-EAf6GN9V3x8Zu4YliLeOk-Iw");
+	string token;
+	ifstream tokenFile;
+	tokenFile.open("token.txt"); 
+	getline(tokenFile, token);
+
+	Bot bot(token);
 	bot.getEvents().onCommand("start",
 			[&bot](TgBot::Message::Ptr message) {
 				bot.getApi().sendMessage(message->chat->id,
@@ -184,6 +192,7 @@ int main() {
 							message->photo[0]->fileId);
 					cout << sourceImage->filePath;
 					imageQRCodeDetect(sourceImage->filePath);
+					if (s.length() > 0)
 					bot.getApi().sendMessage(message->chat->id, s);
 				}
 			});
